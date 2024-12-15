@@ -1,6 +1,10 @@
 # Bug Tracking System.. Project Requirements
 - [ ] GUI is a must
 - [ ] Using databases isn't allowed. To store data in files.
+- [ ] To apply OOP & software engineering principles (Modularization, abstract classes, polymorphism, inheritance, etc...)
+- [ ] Every user can only function as intended & authorized to.
+- [ ] User can login and see his functions.
+
 ## 1. Tester Module
 
 - [ ]  a. Enables tester to define bug name, bug type, priority, bug level, project name, bug date, status.
