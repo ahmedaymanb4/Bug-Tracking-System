@@ -1,68 +1,94 @@
-package bugtrackingsystem;
+package bug_tracking;
 
-/**
- *
- * @author Ahmed Ayman, Amr Khaled, Alaa Mohamed, Atef Khaled, Abdulmalek Mohamed
- */
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Bug {
-    private String name;
-    private String type;
-    private String priority;
-    private String level;
-    private String projectName;
-    private String status;
-    private String screenshotPath; // New field to store the screenshot path
-    private String developerAssigned; // New field to store the developer's name
+    private static int nextId = 1; // Incremental Bug ID
+    private int bugId;
+    private String title;
+    private String description;
+    private String priority; // High, Medium, Low
+    private String status;   // Open, Closed
+    private String assignedTo; // Developer username
+    private String reporter;   // Tester username
 
-    // Constructor
-    public Bug(String name, String type, String priority, String level, String projectName, String status, String screenshotPath, String developerAssigned) {
-        this.name = name;
-        this.type = type;
+    public Bug(String title, String description, String priority, String assignedTo, String reporter) {
+        this.bugId = nextId++;
+        this.title = title;
+        this.description = description;
         this.priority = priority;
-        this.level = level;
-        this.projectName = projectName;
+        this.status = "Open"; // Default status
+        this.assignedTo = assignedTo;
+        this.reporter = reporter;
+    }
+
+    // Constructor for reading bugs from file
+    public Bug(int bugId, String title, String description, String priority, String status, String assignedTo, String reporter) {
+        this.bugId = bugId;
+        this.title = title;
+        this.description = description;
+        this.priority = priority;
         this.status = status;
-        this.screenshotPath = screenshotPath;
-        this.developerAssigned = developerAssigned;
+        this.assignedTo = assignedTo;
+        this.reporter = reporter;
     }
 
-    // Getters and setters
-    public String getName() {
-        return name;
+    // Method to save the bug to bugs.txt
+    public void saveBugToFile(String filename) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename, true))) {
+            writer.write(bugId + "," + title + "," + description + "," + priority + "," + status + "," + assignedTo + "," + reporter);
+            writer.newLine();
+        } catch (IOException e) {
+            System.out.println("Error saving bug to file.");
+        }
     }
 
-    public String getDeveloperAssigned() {
-        return developerAssigned;
+    // Method to load bugs from file
+    public static List<Bug> loadBugsFromFile(String filename) {
+        List<Bug> bugs = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                bugs.add(new Bug(
+                    Integer.parseInt(parts[0]), parts[1], parts[2], parts[3],
+                    parts[4], parts[5], parts[6]
+                ));
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading bugs from file.");
+        }
+        return bugs;
     }
 
-    public String getScreenshotPath() {
-        return screenshotPath;
+    // Getters and Setters
+    public int getBugId() { return bugId; }
+    public String getTitle() { return title; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public String getDeveloperAssigned() {return assignedTo;}
+    
+    public static Bug fromString(String line) {
+        // Split the line into parts using a comma
+        String[] parts = line.split(",");
+
+        // Directly assign all parts as Strings
+        String id = parts[0].trim();
+        String name = parts[1].trim();
+        String type = parts[2].trim();
+        String priority = parts[3].trim();
+        String status = parts[4].trim();
+
+        // Return a new Bug object
+        return new Bug(id, name, type, priority, status);
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
+    
     @Override
     public String toString() {
-        return "Bug{Name='" + name + "', Type='" + type + "', Priority='" + priority + "', Level='" + level + "', ProjectName='" + projectName + "', Status='" + status + "', ScreenshotPath='" + screenshotPath + "', DeveloperAssigned='" + developerAssigned + "'}";
-    }
-
-    public static Bug fromString(String bugString) {
-        String[] parts = bugString.split(", ");
-        String name = parts[0].split("=")[1].replace("'", "");
-        String type = parts[1].split("=")[1].replace("'", "");
-        String priority = parts[2].split("=")[1].replace("'", "");
-        String level = parts[3].split("=")[1].replace("'", "");
-        String projectName = parts[4].split("=")[1].replace("'", "");
-        String status = parts[5].split("=")[1].replace("'", "");
-        String screenshotPath = parts[6].split("=")[1].replace("'", "");
-        String developerAssigned = parts[7].split("=")[1].replace("'", "").replace("}", "");
-
-        return new Bug(name, type, priority, level, projectName, status, screenshotPath, developerAssigned);
+        return "Bug ID: " + bugId + ", Title: " + title + ", Status: " + status +
+               ", Assigned To: " + assignedTo + ", Reporter: " + reporter;
     }
 }

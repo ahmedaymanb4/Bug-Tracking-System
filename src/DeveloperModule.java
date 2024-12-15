@@ -1,4 +1,4 @@
-package bugtrackingsystem;
+package bug_tracking;
 
 /**
  *
@@ -7,9 +7,11 @@ package bugtrackingsystem;
 import java.io.*;
 import java.util.*;
 
-public class DeveloperModule {
+class DeveloperModule extends User{
+    public DeveloperModule(String username, String password) {
+        super(username, password, "Developer");
+    }
 
-    // عرض قائمة خيارات المطور
     public static void showMenu() {
         Scanner scanner = new Scanner(System.in);
 
@@ -25,32 +27,30 @@ public class DeveloperModule {
 
             switch (choice) {
                 case 1:
-                    viewAssignedBugs(scanner);  // عرض الأخطاء المعينة للمطور
+                    viewAssignedBugs(scanner);
                     break;
                 case 2:
-                    changeBugStatus(scanner);  // تغيير حالة الخطأ
+                    changeBugStatus(scanner);
                     break;
                 case 3:
-                    return; // العودة للقائمة الرئيسية
+                    return;
                 default:
                     System.out.println("Invalid choice.");
             }
         }
     }
 
-    // عرض الأخطاء المعينة للمطور
     private static void viewAssignedBugs(Scanner scanner) {
         System.out.print("Enter your name to view your assigned bugs: ");
         String developerName = scanner.nextLine();
 
-        List<Bug> bugs = loadBugsFromFile(); // تحميل الأخطاء من الملف
-        boolean bugFound = false;  // متغير للتحقق إذا تم العثور على أخطاء
+        List<Bug> bugs = loadBugsFromFile();
+        boolean bugFound = false;
 
         System.out.println("\n--- Assigned Bugs ---");
         for (Bug bug : bugs) {
-            // التحقق من أن الخطأ مخصص لهذا المطور
             if (bug.getDeveloperAssigned() != null && bug.getDeveloperAssigned().equalsIgnoreCase(developerName)) {
-                System.out.println(bug);  // عرض تفاصيل الخطأ
+                System.out.println(bug);
                 bugFound = true;
             }
         }
@@ -60,7 +60,6 @@ public class DeveloperModule {
         }
     }
 
-    // تغيير حالة الخطأ
     private static void changeBugStatus(Scanner scanner) {
         System.out.print("Enter Bug Name to Change Status: ");
         String bugName = scanner.nextLine();
@@ -74,7 +73,6 @@ public class DeveloperModule {
 
             while ((line = reader.readLine()) != null) {
                 if (line.contains("Name='" + bugName + "'")) {
-                    // تحديث حالة الخطأ
                     line = line.replaceFirst("Status='.*?'", "Status='" + newStatus + "'");
                     found = true;
                 }
@@ -90,22 +88,31 @@ public class DeveloperModule {
             System.out.println("Error updating bug status.");
         }
 
-        // إعادة تسمية الملف بعد التحديث
         new File("temp.txt").renameTo(new File("bugs.txt"));
     }
 
-    // تحميل الأخطاء من الملف
     private static List<Bug> loadBugsFromFile() {
         List<Bug> bugs = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader("bugs.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                // تحويل السطر إلى كائن Bug باستخدام دالة fromString
                 bugs.add(Bug.fromString(line));
             }
         } catch (IOException e) {
             System.out.println("Error loading bugs.");
         }
         return bugs;
+    }
+
+    /**
+     * <p>
+     * @Override public void displayDashboard() is important, 
+     * as this Class is inherited from (extends) User Abstract Class. 
+     * </p>
+     */
+    @Override
+    public void displayDashboard() {
+        System.out.println("Welcome, Admin! Here you can report and monitor bugs.");
+        // You can expand this with GUI or options.
     }
 }

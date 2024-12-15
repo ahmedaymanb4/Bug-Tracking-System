@@ -1,4 +1,4 @@
-package bugtrackingsystem;
+package bug_tracking;
 
 /**
  *
@@ -7,7 +7,11 @@ package bugtrackingsystem;
 import java.io.*;
 import java.util.Scanner;
 
-public class AdminModule {
+class AdminModule extends User{
+    public AdminModule(String username, String password) {
+        super(username, password, "Admin");
+    }
+
     public static void showMenu() {
         Scanner scanner = new Scanner(System.in);
 
@@ -70,11 +74,34 @@ public class AdminModule {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("users.txt", true))) {
             System.out.print("Enter Username: ");
             String username = scanner.nextLine();
-            System.out.print("Enter Role (Tester/Developer/PM/Admin): ");
+            System.out.print("Enter Password: ");
+            String password = scanner.nextLine();
+            System.out.print("Enter Role (Tester/Developer/ProjectManager/Admin): ");
             String role = scanner.nextLine();
 
-            User newUser = new User(username, role); // Using the User class
-            writer.write(newUser.getUsername() + "," + newUser.getRole() + "\n");
+            User newUser;
+
+            // Instantiate the appropriate subclass based on role
+            switch (role) {
+                case "Tester":
+                    newUser = new TesterModule(username, password);
+                    break;
+                case "Developer":
+                    newUser = new DeveloperModule(username, password);
+                    break;
+                case "ProjectManager":
+                    newUser = new ProjectManager(username, password);
+                    break;
+                case "Admin":
+                    newUser = new AdminModule(username, password);
+                    break;
+                default:
+                    System.out.println("Invalid role. User not added.");
+                    return;
+            }
+
+            // Write the user details to file
+            writer.write(newUser.username + "," + newUser.password + "," + newUser.role + "\n");
             System.out.println("User added successfully.");
         } catch (IOException e) {
             System.out.println("Error adding user.");
@@ -91,5 +118,17 @@ public class AdminModule {
         } catch (IOException e) {
             System.out.println("Error reading users.");
         }
+    }
+
+    /**
+     * <p>
+     * @Override public void displayDashboard() is important, 
+     * as this Class is inherited from (extends) User Abstract Class. 
+     * </p>
+     */
+    @Override
+    public void displayDashboard() {
+        System.out.println("Welcome, Admin! Here you can report and monitor bugs.");
+        // You can expand this with GUI or options.
     }
 }
