@@ -1,4 +1,4 @@
-package bug_tracking;
+package bugtrackingsystem;
 
 /**
  *
@@ -7,10 +7,7 @@ package bug_tracking;
 import java.io.*;
 import java.util.*;
 
-class DeveloperModule extends User{
-    public DeveloperModule(String username, String password) {
-        super(username, password, "Developer");
-    }
+public class DeveloperModule {
 
     public static void showMenu() {
         Scanner scanner = new Scanner(System.in);
@@ -27,13 +24,13 @@ class DeveloperModule extends User{
 
             switch (choice) {
                 case 1:
-                    viewAssignedBugs(scanner);
+                    viewAssignedBugs(scanner);  
                     break;
                 case 2:
-                    changeBugStatus(scanner);
+                    changeBugStatus(scanner);  
                     break;
                 case 3:
-                    return;
+                    return; 
                 default:
                     System.out.println("Invalid choice.");
             }
@@ -44,13 +41,13 @@ class DeveloperModule extends User{
         System.out.print("Enter your name to view your assigned bugs: ");
         String developerName = scanner.nextLine();
 
-        List<Bug> bugs = loadBugsFromFile();
-        boolean bugFound = false;
-
+        List<Bug> bugs = loadBugsFromFile(); 
+        boolean bugFound = false;  
         System.out.println("\n--- Assigned Bugs ---");
         for (Bug bug : bugs) {
+            
             if (bug.getDeveloperAssigned() != null && bug.getDeveloperAssigned().equalsIgnoreCase(developerName)) {
-                System.out.println(bug);
+                System.out.println(bug);  
                 bugFound = true;
             }
         }
@@ -61,58 +58,62 @@ class DeveloperModule extends User{
     }
 
     private static void changeBugStatus(Scanner scanner) {
-        System.out.print("Enter Bug Name to Change Status: ");
-        String bugName = scanner.nextLine();
-        System.out.print("Enter New Status (Open/Closed): ");
-        String newStatus = scanner.nextLine();
+    System.out.print("Enter Bug Name to Change Status: ");
+    String bugName = scanner.nextLine();
+    System.out.print("Enter New Status (Open/Closed): ");
+    String newStatus = scanner.nextLine();
 
-        try (BufferedReader reader = new BufferedReader(new FileReader("bugs.txt"));
-             BufferedWriter writer = new BufferedWriter(new FileWriter("temp.txt"))) {
-            String line;
-            boolean found = false;
+    File inputFile = new File("bugs.txt");
+    File tempFile = new File("temp.txt");
 
-            while ((line = reader.readLine()) != null) {
-                if (line.contains("Name='" + bugName + "'")) {
-                    line = line.replaceFirst("Status='.*?'", "Status='" + newStatus + "'");
-                    found = true;
-                }
-                writer.write(line + "\n");
+    boolean found = false;
+
+    try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+         BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
+
+        String line;
+
+        while ((line = reader.readLine()) != null) {
+            
+            if (line.contains("Name='" + bugName + "'")) {
+                line = line.replaceFirst("Status='.*?'", "Status='" + newStatus + "'");
+                found = true;
             }
-
-            if (found) {
-                System.out.println("Bug status updated successfully.");
-            } else {
-                System.out.println("Bug not found.");
-            }
-        } catch (IOException e) {
-            System.out.println("Error updating bug status.");
+            writer.write(line + "\n");
         }
 
-        new File("temp.txt").renameTo(new File("bugs.txt"));
+        if (found) {
+            System.out.println("Bug status updated successfully.");
+        } else {
+            System.out.println("Bug not found.");
+        }
+
+    } catch (IOException e) {
+        System.out.println("Error updating bug status: " + e.getMessage());
     }
+
+    if (inputFile.delete()) {
+        if (!tempFile.renameTo(inputFile)) {
+            System.out.println("Failed to rename temp file to bugs.txt");
+        }
+    } else {
+        System.out.println("Failed to delete original file.");
+    }
+}
 
     private static List<Bug> loadBugsFromFile() {
-        List<Bug> bugs = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader("bugs.txt"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                bugs.add(Bug.fromString(line));
+    List<Bug> bugs = new ArrayList<>();
+    try (BufferedReader reader = new BufferedReader(new FileReader("bugs.txt"))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+            Bug bug = Bug.fromString(line);
+            if (bug != null) { 
+                bugs.add(bug);
             }
-        } catch (IOException e) {
-            System.out.println("Error loading bugs.");
         }
-        return bugs;
+    } catch (IOException e) {
+        System.out.println("Error loading bugs.");
     }
-
-    /**
-     * <p>
-     * @Override public void displayDashboard() is important, 
-     * as this Class is inherited from (extends) User Abstract Class. 
-     * </p>
-     */
-    @Override
-    public void displayDashboard() {
-        System.out.println("Welcome, Admin! Here you can report and monitor bugs.");
-        // You can expand this with GUI or options.
-    }
+    return bugs;
+}
 }

@@ -4,6 +4,8 @@ package bugtrackingsystem;
  *
  * @author Ahmed Ayman, Amr Khaled, Alaa Mohamed, Atef Khaled, Abdulmalek Mohamed
  */
+import java.util.Map;
+import java.util.HashMap;
 import java.io.*;
 import java.util.Scanner;
 
@@ -32,8 +34,44 @@ public class ProjectModule {
     }
 
     private static void checkPerformance() {
-        System.out.println("Performance analysis is simulated here. Actual implementation depends on project-specific metrics.");
+    try (BufferedReader reader = new BufferedReader(new FileReader("bugs.txt"))) {
+        Map<String, Integer> developerPerformance = new HashMap<>();
+        Map<String, Integer> testerPerformance = new HashMap<>();
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            Bug bug = Bug.fromString(line);
+
+            // تحقق من أن الكائن bug ليس null
+            if (bug != null) {
+                // حساب أداء المطورين بناءً على حالة الأخطاء
+                if (bug.getDeveloperAssigned() != null) {
+                    String developer = bug.getDeveloperAssigned();
+                    developerPerformance.put(developer, developerPerformance.getOrDefault(developer, 0) + 1);
+                }
+
+                // حساب أداء المختبرين بناءً على جميع الأخطاء المضافة
+                String tester = "Tester"; // لا يوجد حقل مخصص للمختبر في الكود، لذا سنفترض أنهم جميعًا "Testers"
+                testerPerformance.put(tester, testerPerformance.getOrDefault(tester, 0) + 1);
+            } else {
+                System.out.println("Warning: Skipping invalid bug entry -> " + line);
+            }
+        }
+
+        // عرض أداء المطورين
+        System.out.println("\n--- Developer Performance ---");
+        developerPerformance.forEach((developer, count) -> 
+            System.out.println("Developer: " + developer + ", Bugs Fixed: " + count));
+
+        // عرض أداء المختبرين
+        System.out.println("\n--- Tester Performance ---");
+        testerPerformance.forEach((tester, count) -> 
+            System.out.println("Tester: " + tester + ", Bugs Reported: " + count));
+
+    } catch (IOException e) {
+        System.out.println("Error analyzing performance: " + e.getMessage());
     }
+}
 
     private static void monitorBugs() {
         try (BufferedReader reader = new BufferedReader(new FileReader("bugs.txt"))) {
