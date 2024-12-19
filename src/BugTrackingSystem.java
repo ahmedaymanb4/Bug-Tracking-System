@@ -33,7 +33,11 @@ public class BugTrackingSystem {
 
             switch (choice) {
                 case 1 -> TesterModule.showMenu();
-                case 2 -> DeveloperModule.showMenu();
+                case 2 -> {
+                    System.out.print("Enter your username: ");
+                    String username = scanner.nextLine();
+                    DeveloperModule.showMenu(username);
+                }
                 case 3 -> AdminModule.showMenu();
                 case 4 -> ProjectModule.showMenu();
                 case 5 -> {

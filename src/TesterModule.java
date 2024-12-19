@@ -7,6 +7,7 @@ import java.util.*;
  * @author Ahmed Ayman, Amr Khaled, Alaa Mohamed, Atef Khaled, Abdulmalek Mohamed
  */
 public class TesterModule {
+    private static String email;
 
     // Function to show the Tester module menu
     public static void showMenu() {
@@ -150,4 +151,13 @@ public class TesterModule {
             System.out.println("Error saving bugs.");
         }
     }
+    
+    public static String getEmail() {
+        return email;
+    }
+
+    private void setEmail(String email) {
+        this.email = email;
+    }
+    
 }

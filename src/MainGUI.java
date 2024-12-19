@@ -23,7 +23,7 @@ public class MainGUI {
             frame.add(testerButton);
 
             JButton developerButton = new JButton("Developer Module");
-            developerButton.addActionListener(e -> new DeveloperGUI());
+            developerButton.addActionListener(e -> showLoginDialog("Developer"));
             frame.add(developerButton);
 
             JButton adminButton = new JButton("Admin Module");
@@ -36,5 +36,29 @@ public class MainGUI {
 
             frame.setVisible(true);
         });
+    }
+
+    private static void showLoginDialog(String role) {
+        JTextField usernameField = new JTextField();
+        JPasswordField passwordField = new JPasswordField();
+        Object[] message = {
+            "Username:", usernameField,
+            "Password:", passwordField
+        };
+
+        int option = JOptionPane.showConfirmDialog(null, message, "Login", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
+
+            if (BugTrackingSystem.validateCredentials(username, password)) {
+                if (role.equals("Developer")) {
+                    new DeveloperGUI(username);
+                }
+                // Add other roles as needed
+            } else {
+                JOptionPane.showMessageDialog(null, "Invalid credentials");
+            }
+        }
     }
 }
